@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fibonacci Master</title>
+    <title>FiboMaster</title>
     <style>
         * {
             margin: 0;
@@ -49,7 +49,7 @@
             background-color: #2c2f33;
             border: none;
             color: #9b9b9b;
-            font-size: 24px;
+            font-size: 16px; /* Знак вопроса 16px */
             font-weight: 500;
             display: flex;
             align-items: center;
@@ -88,15 +88,28 @@
         }
 
         /* Направление */
+        .direction-section {
+            background-color: #1e1f22;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .direction-label {
+            color: #9b9b9b;
+            font-size: 14px;
+            margin-bottom: 12px; /* Отступ как в инпутах */
+            font-weight: 500;
+        }
+
         .direction-buttons {
             display: flex;
             gap: 12px;
-            margin-top: 8px;
         }
 
         .direction-btn {
             flex: 1;
-            padding: 12px 16px;
+            padding: 16px;
             border-radius: 12px;
             background-color: #2c2f33;
             border: 2px solid transparent;
@@ -105,6 +118,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            height: 56px; /* Фиксированная высота как у кнопки Рассчитать */
         }
 
         .direction-btn.up.active {
@@ -118,7 +132,7 @@
         }
 
         .direction-arrow {
-            font-size: 16px; /* в два раза меньше */
+            font-size: 16px;
             font-weight: 400;
             line-height: 1;
         }
@@ -144,12 +158,16 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
+            background-color: #1e1f22;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
         }
 
         .extended-title {
             font-size: 16px;
             font-weight: 500;
-            margin-bottom: 4px;
+            margin-bottom: 8px; /* Отступ 20-30% от 16px = ~5px, взял 8px */
         }
 
         .extended-sub {
@@ -158,10 +176,10 @@
         }
 
         .toggle {
-            width: 52px;
-            height: 32px;
+            width: 47px; /* на 10% меньше от 52px */
+            height: 29px; /* на 10% меньше от 32px */
             background-color: #2c2f33;
-            border-radius: 32px;
+            border-radius: 29px;
             position: relative;
             transition: 0.2s;
         }
@@ -172,8 +190,8 @@
 
         .toggle::after {
             content: '';
-            width: 28px;
-            height: 28px;
+            width: 25px; /* пропорционально */
+            height: 25px;
             background-color: #ffffff;
             border-radius: 50%;
             position: absolute;
@@ -183,7 +201,7 @@
         }
 
         .toggle.active::after {
-            left: 22px;
+            left: 20px; /* 47px - 25px - 2px = 20px */
         }
 
         /* Кнопка расчета (Ghost) */
@@ -199,6 +217,10 @@
             cursor: pointer;
             margin: 20px 0;
             transition: 0.2s;
+            height: 56px; /* Фиксированная высота */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .calculate-btn:hover {
@@ -227,7 +249,7 @@
 
         /* Подсказка */
         .copy-hint {
-            color: #9b9b9b;
+            color: #5a5a5a; /* Темнее основного серого (#9b9b9b) */
             font-size: 13px;
             margin-bottom: 16px;
             font-style: italic;
@@ -259,7 +281,7 @@
             color: #31C55F;
         }
 
-        /* Карточки результатов */
+        /* Карточки результатов - высота как у кнопок */
         .result-card {
             background-color: #1e1f22;
             border-radius: 12px;
@@ -270,6 +292,7 @@
             align-items: center;
             cursor: pointer;
             border-left: 4px solid;
+            height: 56px; /* Как у кнопок */
         }
 
         .result-card.correction {
@@ -362,7 +385,7 @@
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 12px;
-            color: #ffffff;
+            color: #ffffff; /* Белый */
         }
 
         .help-block p {
@@ -385,6 +408,7 @@
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 12px;
+            color: #ffffff; /* Белый */
         }
 
         .trend-arrow {
@@ -399,15 +423,12 @@
             color: #F0453E;
         }
 
-        .trend-title-text {
-            color: #9b9b9b;
-        }
-
         .trend-block .formula {
             color: #9b9b9b;
             font-family: monospace;
             font-size: 14px;
-            margin: 8px 0;
+            margin: 12px 0; /* Увеличенный отступ между строками */
+            line-height: 1.6; /* Межстрочное расстояние +50% */
         }
 
         .example-block {
@@ -423,7 +444,7 @@
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 12px;
-            color: #9b9b9b;
+            color: #ffffff; /* Белый */
         }
 
         .example-arrow {
@@ -442,7 +463,8 @@
             color: #9b9b9b;
             font-family: monospace;
             font-size: 14px;
-            margin: 8px 0;
+            margin: 12px 0; /* Увеличенный отступ */
+            line-height: 1.6;
         }
 
         .toast {
@@ -468,7 +490,7 @@
     <div class="app-container">
         <!-- Шапка -->
         <div class="header">
-            <h1>Fibonacci Master</h1>
+            <h1>FiboMaster</h1>
             <button class="help-button" onclick="showHelp()">?</button>
         </div>
 
@@ -485,8 +507,8 @@
         </div>
 
         <!-- Направление -->
-        <div class="card">
-            <div class="card-label">Направление тренда</div>
+        <div class="direction-section">
+            <div class="direction-label">Направление тренда</div>
             <div class="direction-buttons">
                 <div class="direction-btn up active" onclick="setDirection('up')">
                     <span class="direction-arrow">↑</span>
@@ -500,7 +522,7 @@
         </div>
 
         <!-- Расширенные уровни -->
-        <div class="card extended-card" onclick="toggleExtended()">
+        <div class="extended-card" onclick="toggleExtended()">
             <div>
                 <div class="extended-title">Расширенные уровни</div>
                 <div class="extended-sub">0.236, 0.786, 2.618</div>
@@ -557,7 +579,7 @@
                 <div class="trend-block">
                     <div class="trend-title">
                         <span class="trend-arrow up">↑</span>
-                        <span class="trend-title-text">Тренд ВВЕРХ (бычий)</span>
+                        <span>Тренд ВВЕРХ (бычий)</span>
                     </div>
                     <p>Точка А — это дно, точка Б — вершина.</p>
                     <div class="formula">• Коррекция (откат вниз): от Б минус коэффициент</div>
@@ -567,7 +589,7 @@
                 <div class="trend-block">
                     <div class="trend-title">
                         <span class="trend-arrow down">↓</span>
-                        <span class="trend-title-text">Тренд ВНИЗ (медвежий)</span>
+                        <span>Тренд ВНИЗ (медвежий)</span>
                     </div>
                     <p>Точка А — это вершина, точка Б — дно.</p>
                     <div class="formula">• Коррекция (откат вверх): от Б плюс коэффициент</div>
@@ -580,7 +602,7 @@
                 <div class="example-block">
                     <div class="example-title">
                         <span class="example-arrow down">↓</span>
-                        <span>Биткоин падает с 100 000 до 50 000</span>
+                        <span>Биткоин падает с 100 000 до 50 000</span>
                     </div>
                     <div class="formula">↑ Коррекция вверх: 50 000 + (50 000 × 0.382) = 69 100</div>
                     <div class="formula">↓ Расширение вниз: 50 000 – (50 000 × 0.618) = 19 100</div>
