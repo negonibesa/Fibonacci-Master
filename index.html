@@ -25,6 +25,7 @@
             margin: 0 auto;
             width: 100%;
             padding: 20px;
+            flex: 1;
         }
 
         .header {
@@ -324,6 +325,47 @@
             color: #31C55F;
         }
 
+        /* Донорская плашка */
+        .donation-section {
+            margin-top: 40px;
+            padding: 16px 0 8px;
+            text-align: center;
+            border-top: 1px solid #2c2f33;
+        }
+
+        .donation-title {
+            color: #6a6a6a;
+            font-size: 12px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .wallet-address {
+            display: inline-block;
+            background-color: #1a1c1e;
+            padding: 8px 16px;
+            border-radius: 30px;
+            color: #8a8a8a;
+            font-size: 13px;
+            font-family: monospace;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 1px solid #2c2f33;
+            max-width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .wallet-address:hover {
+            background-color: #2c2f33;
+            color: #b0b0b0;
+        }
+
+        .wallet-address:active {
+            background-color: #3a3f45;
+        }
+
         .help-screen {
             display: none;
             position: fixed;
@@ -485,12 +527,12 @@
 
         <div class="card">
             <div class="card-label">Точка A</div>
-            <input type="text" id="pointA" value="15599" placeholder="15599">
+            <input type="text" id="pointA" value="0.34" placeholder="0.34">
         </div>
 
         <div class="card">
             <div class="card-label">Точка Б</div>
-            <input type="text" id="pointB" value="84000" placeholder="84000">
+            <input type="text" id="pointB" value="0.1" placeholder="0.1">
         </div>
 
         <div class="direction-section">
@@ -545,6 +587,12 @@
                 <div id="extendedCorrection"></div>
                 <div id="extendedExtension"></div>
             </div>
+        </div>
+
+        <!-- Донорская плашка -->
+        <div class="donation-section">
+            <div class="donation-title">Помощь Разработчику USDT(TRC20)</div>
+            <div class="wallet-address" onclick="copyWallet()">TJvsE7XmVXbrvGzdZZVsLCwzDtuUHQ5GR7</div>
         </div>
     </div>
 
@@ -640,20 +688,33 @@
 
         function parseNumber(str) {
             if (!str) return 0;
-            // Заменяем запятую на точку и парсим
             return parseFloat(str.replace(',', '.')) || 0;
         }
 
         function formatNumber(num) {
-            return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+            if (Number.isInteger(num) && Math.abs(num) >= 1000) {
+                return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+            }
+            if (Math.abs(num) < 1) {
+                return num.toFixed(8).replace(/\.?0+$/, '');
+            }
+            return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         }
 
-        function showToast() {
+        function showToast(message = 'Скопировано') {
             const toast = document.getElementById('toast');
+            toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 1500);
+        }
+
+        function copyWallet() {
+            const wallet = 'TJvsE7XmVXbrvGzdZZVsLCwzDtuUHQ5GR7';
+            navigator.clipboard.writeText(wallet).then(() => {
+                showToast('Адрес скопирован');
+            });
         }
 
         function createResult(percent, coeff, value, type) {
@@ -669,7 +730,7 @@
                 <span class="result-number">${formatNumber(value)}</span>
             `;
             div.onclick = () => {
-                navigator.clipboard.writeText(Math.round(value).toString()).then(showToast);
+                navigator.clipboard.writeText(value.toString()).then(() => showToast());
             };
             return div;
         }
@@ -686,7 +747,6 @@
                 return;
             }
 
-            // Определяем минимум и максимум
             const min = Math.min(a, b);
             const max = Math.max(a, b);
             const diff = max - min;
@@ -717,7 +777,6 @@
             extendedExtensionDiv.innerHTML = '';
 
             if (currentDirection === 'up') {
-                // Тренд вверх: min — дно, max — вершина
                 baseLevels.forEach(level => {
                     const corr = max - (diff * level.c);
                     const ext = max + (diff * level.c);
@@ -748,7 +807,6 @@
                     document.getElementById('extendedResults').style.display = 'none';
                 }
             } else {
-                // Тренд вниз: max — вершина, min — дно
                 baseLevels.forEach(level => {
                     const corr = min + (diff * level.c);
                     const ext = min - (diff * level.c);
