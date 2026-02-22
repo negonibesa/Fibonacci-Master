@@ -27,7 +27,6 @@
             padding: 20px;
         }
 
-        /* Шапка */
         .header {
             display: flex;
             justify-content: space-between;
@@ -57,7 +56,6 @@
             cursor: pointer;
         }
 
-        /* Карточки */
         .card {
             background-color: #1e1f22;
             border-radius: 16px;
@@ -87,7 +85,6 @@
             color: #3a3f45;
         }
 
-        /* Направление */
         .direction-section {
             background-color: #1e1f22;
             border-radius: 16px;
@@ -152,7 +149,6 @@
             color: #F0453E;
         }
 
-        /* Расширенные уровни */
         .extended-card {
             display: flex;
             justify-content: space-between;
@@ -204,7 +200,6 @@
             left: 20px;
         }
 
-        /* Кнопка расчета (Ghost) */
         .calculate-btn {
             width: 100%;
             background: transparent;
@@ -227,7 +222,6 @@
             border-color: #ffffff;
         }
 
-        /* Разница */
         .diff-box {
             background-color: #1e1f22;
             border-radius: 12px;
@@ -247,7 +241,6 @@
             font-size: 18px;
         }
 
-        /* Подсказка */
         .copy-hint {
             color: #5a5a5a;
             font-size: 13px;
@@ -255,7 +248,6 @@
             font-style: italic;
         }
 
-        /* Заголовки секций */
         .section-title {
             display: flex;
             align-items: center;
@@ -281,7 +273,6 @@
             color: #31C55F;
         }
 
-        /* Карточки результатов */
         .result-card {
             background-color: #1e1f22;
             border-radius: 12px;
@@ -333,7 +324,6 @@
             color: #31C55F;
         }
 
-        /* Экран помощи */
         .help-screen {
             display: none;
             position: fixed;
@@ -488,25 +478,21 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Шапка -->
         <div class="header">
             <h1>FiboMaster</h1>
             <button class="help-button" onclick="showHelp()">?</button>
         </div>
 
-        <!-- Точка A -->
         <div class="card">
             <div class="card-label">Точка A</div>
-            <input type="number" id="pointA" value="15599" step="any" placeholder="15599">
+            <input type="text" id="pointA" value="15599" placeholder="15599">
         </div>
 
-        <!-- Точка Б -->
         <div class="card">
             <div class="card-label">Точка Б</div>
-            <input type="number" id="pointB" value="84000" step="any" placeholder="84000">
+            <input type="text" id="pointB" value="84000" placeholder="84000">
         </div>
 
-        <!-- Направление -->
         <div class="direction-section">
             <div class="direction-label">Направление тренда</div>
             <div class="direction-buttons">
@@ -521,7 +507,6 @@
             </div>
         </div>
 
-        <!-- Расширенные уровни -->
         <div class="extended-card" onclick="toggleExtended()">
             <div>
                 <div class="extended-title">Расширенные уровни</div>
@@ -530,10 +515,8 @@
             <div class="toggle" id="toggle"></div>
         </div>
 
-        <!-- Кнопка расчета -->
         <button class="calculate-btn" onclick="calculate()">Рассчитать</button>
 
-        <!-- Результаты -->
         <div id="results" style="display: none;">
             <div class="diff-box">
                 <span class="diff-label">Разница:</span>
@@ -565,7 +548,6 @@
         </div>
     </div>
 
-    <!-- Экран помощи -->
     <div class="help-screen" id="helpScreen">
         <div class="help-header">
             <h2>Как это работает</h2>
@@ -598,7 +580,17 @@
             </div>
 
             <div class="help-block">
-                <h3>Пример</h3>
+                <h3>Примеры</h3>
+                
+                <div class="example-block" style="margin-bottom: 16px;">
+                    <div class="example-title">
+                        <span class="example-arrow up">↑</span>
+                        <span>Биткоин растёт с 50 000 до 100 000</span>
+                    </div>
+                    <div class="formula">↓ Коррекция вниз: 100 000 – (50 000 × 0.382) = 80 900</div>
+                    <div class="formula">↑ Расширение вверх: 100 000 + (50 000 × 0.618) = 130 900</div>
+                </div>
+
                 <div class="example-block">
                     <div class="example-title">
                         <span class="example-arrow down">↓</span>
@@ -611,7 +603,6 @@
         </div>
     </div>
 
-    <!-- Уведомление -->
     <div class="toast" id="toast">Скопировано</div>
 
     <script>
@@ -647,6 +638,12 @@
             }
         }
 
+        function parseNumber(str) {
+            if (!str) return 0;
+            // Заменяем запятую на точку и парсим
+            return parseFloat(str.replace(',', '.')) || 0;
+        }
+
         function formatNumber(num) {
             return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         }
@@ -660,7 +657,6 @@
         }
 
         function createResult(percent, coeff, value, type) {
-            // Не создаём карточку, если значение отрицательное
             if (value < 0) return null;
             
             const div = document.createElement('div');
@@ -679,15 +675,22 @@
         }
 
         function calculate() {
-            const a = parseFloat(document.getElementById('pointA').value) || 0;
-            const b = parseFloat(document.getElementById('pointB').value) || 0;
+            const rawA = document.getElementById('pointA').value;
+            const rawB = document.getElementById('pointB').value;
+            
+            const a = parseNumber(rawA);
+            const b = parseNumber(rawB);
             
             if (a === b) {
                 alert('Точки должны отличаться');
                 return;
             }
 
-            const diff = Math.abs(a - b);
+            // Определяем минимум и максимум
+            const min = Math.min(a, b);
+            const max = Math.max(a, b);
+            const diff = max - min;
+
             document.getElementById('diffValue').textContent = formatNumber(diff);
             
             const baseLevels = [
@@ -713,50 +716,68 @@
             extendedCorrectionDiv.innerHTML = '';
             extendedExtensionDiv.innerHTML = '';
 
-            // Базовые уровни
-            baseLevels.forEach(level => {
-                let corr, ext;
-                if (currentDirection === 'up') {
-                    corr = b - (diff * level.c);
-                    ext = b + (diff * level.c);
-                } else {
-                    corr = b + (diff * level.c);
-                    ext = b - (diff * level.c);
-                }
-                
-                const corrCard = createResult(level.p, level.c.toFixed(3), corr, 'correction');
-                if (corrCard) correctionDiv.appendChild(corrCard);
-                
-                const extCard = createResult(level.p, level.c.toFixed(3), ext, 'extension');
-                if (extCard) extensionDiv.appendChild(extCard);
-            });
-
-            // Расширенные уровни
-            if (extendedEnabled) {
-                document.getElementById('extendedResults').style.display = 'block';
-                
-                extLevels.forEach(level => {
-                    let corr, ext;
-                    if (currentDirection === 'up') {
-                        corr = b - (diff * level.c);
-                        ext = b + (diff * level.c);
-                    } else {
-                        corr = b + (diff * level.c);
-                        ext = b - (diff * level.c);
-                    }
+            if (currentDirection === 'up') {
+                // Тренд вверх: min — дно, max — вершина
+                baseLevels.forEach(level => {
+                    const corr = max - (diff * level.c);
+                    const ext = max + (diff * level.c);
                     
-                    // Коррекция (только коэффициенты < 1)
-                    if (level.c < 1) {
-                        const corrCard = createResult(level.p, level.c.toFixed(3), corr, 'correction');
-                        if (corrCard) extendedCorrectionDiv.appendChild(corrCard);
-                    }
+                    const corrCard = createResult(level.p, level.c.toFixed(3), corr, 'correction');
+                    if (corrCard) correctionDiv.appendChild(corrCard);
                     
-                    // Расширение (все)
                     const extCard = createResult(level.p, level.c.toFixed(3), ext, 'extension');
-                    if (extCard) extendedExtensionDiv.appendChild(extCard);
+                    if (extCard) extensionDiv.appendChild(extCard);
                 });
+
+                if (extendedEnabled) {
+                    document.getElementById('extendedResults').style.display = 'block';
+                    
+                    extLevels.forEach(level => {
+                        const corr = max - (diff * level.c);
+                        const ext = max + (diff * level.c);
+                        
+                        if (level.c < 1) {
+                            const corrCard = createResult(level.p, level.c.toFixed(3), corr, 'correction');
+                            if (corrCard) extendedCorrectionDiv.appendChild(corrCard);
+                        }
+                        
+                        const extCard = createResult(level.p, level.c.toFixed(3), ext, 'extension');
+                        if (extCard) extendedExtensionDiv.appendChild(extCard);
+                    });
+                } else {
+                    document.getElementById('extendedResults').style.display = 'none';
+                }
             } else {
-                document.getElementById('extendedResults').style.display = 'none';
+                // Тренд вниз: max — вершина, min — дно
+                baseLevels.forEach(level => {
+                    const corr = min + (diff * level.c);
+                    const ext = min - (diff * level.c);
+                    
+                    const corrCard = createResult(level.p, level.c.toFixed(3), corr, 'correction');
+                    if (corrCard) correctionDiv.appendChild(corrCard);
+                    
+                    const extCard = createResult(level.p, level.c.toFixed(3), ext, 'extension');
+                    if (extCard) extensionDiv.appendChild(extCard);
+                });
+
+                if (extendedEnabled) {
+                    document.getElementById('extendedResults').style.display = 'block';
+                    
+                    extLevels.forEach(level => {
+                        const corr = min + (diff * level.c);
+                        const ext = min - (diff * level.c);
+                        
+                        if (level.c < 1) {
+                            const corrCard = createResult(level.p, level.c.toFixed(3), corr, 'correction');
+                            if (corrCard) extendedCorrectionDiv.appendChild(corrCard);
+                        }
+                        
+                        const extCard = createResult(level.p, level.c.toFixed(3), ext, 'extension');
+                        if (extCard) extendedExtensionDiv.appendChild(extCard);
+                    });
+                } else {
+                    document.getElementById('extendedResults').style.display = 'none';
+                }
             }
 
             document.getElementById('results').style.display = 'block';
