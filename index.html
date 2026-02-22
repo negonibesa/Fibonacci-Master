@@ -1,13 +1,358 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fibonacci Master</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #0d0f10;
+            color: white;
+            padding: 20px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #1e1f22;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .label {
+            color: #9b9b9b;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        input {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 32px;
+            font-weight: 600;
+            width: 100%;
+            outline: none;
+        }
+        .direction-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .direction-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: #2c2f33;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .direction-btn.up.active {
+            border-color: #4caf92;
+            background: #2b3b2b;
+            color: #4caf92;
+        }
+        .direction-btn.down.active {
+            border-color: #f44336;
+            background: #3b2b2b;
+            color: #f44336;
+        }
+        .extended {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .checkbox {
+            width: 52px;
+            height: 32px;
+            background: #2c2f33;
+            border-radius: 32px;
+            position: relative;
+            transition: 0.3s;
+        }
+        .checkbox.active {
+            background: #4caf92;
+        }
+        .checkbox::after {
+            content: '';
+            width: 28px;
+            height: 28px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+        }
+        .checkbox.active::after {
+            left: 22px;
+        }
+        .calc-btn {
+            width: 100%;
+            background: #4caf92;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        .diff {
+            background: #1e1f22;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .section-title {
+            color: #9b9b9b;
+            margin: 20px 0 12px;
+            text-transform: uppercase;
+        }
+        .result-card {
+            background: #1e1f22;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-left: 4px solid;
+        }
+        .result-card.correction {
+            border-left-color: #f44336;
+        }
+        .result-card.extension {
+            border-left-color: #4caf92;
+        }
+        .result-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .result-percent {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .result-coeff {
+            color: #9b9b9b;
+            font-size: 14px;
+        }
+        .result-value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .correction .result-value {
+            color: #f44336;
+        }
+        .extension .result-value {
+            color: #4caf92;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2c2f33;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <h1>Fibonacci Master</h1>
 
+    <div class="card">
+        <div class="label">Точка A</div>
+        <input type="number" id="pointA" value="15599">
+    </div>
+
+    <div class="card">
+        <div class="label">Точка Б</div>
+        <input type="number" id="pointB" value="84000">
+    </div>
+
+    <div class="card">
+        <div class="label">Направление тренда</div>
+        <div class="direction-buttons">
+            <button class="direction-btn up active" onclick="setDirection('up')">📈 Вверх</button>
+            <button class="direction-btn down" onclick="setDirection('down')">📉 Вниз</button>
+        </div>
+    </div>
+
+    <div class="card extended" onclick="toggleExtended()">
+        <div>
+            <div style="font-weight: 500;">Расширенные уровни</div>
+            <div style="color: #9b9b9b; font-size: 14px;">0.236, 0.786, 2.618</div>
+        </div>
+        <div class="checkbox" id="extendedCheckbox"></div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Рассчитать</button>
+
+    <div id="results" style="display: none;">
+        <div class="diff">
+            <span style="color: #9b9b9b;">Разница:</span>
+            <span style="color: #4caf92; font-weight: 600;" id="diffValue">0</span>
+        </div>
+
+        <div class="section-title">↓ КОРРЕКЦИЯ (откат)</div>
+        <div id="correctionResults"></div>
+
+        <div class="section-title">↑ РАСШИРЕНИЕ (цели)</div>
+        <div id="extensionResults"></div>
+
+        <div id="extendedResults" style="display: none;">
+            <div class="section-title">📊 РАСШИРЕННЫЕ УРОВНИ</div>
+            <div id="extendedCorrection"></div>
+            <div id="extendedExtension"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Скопировано!</div>
+
+    <script>
+        let currentDirection = 'up';
+        let extendedEnabled = false;
+
+        function setDirection(dir) {
+            currentDirection = dir;
+            document.querySelectorAll('.direction-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.direction-btn.${dir}`).classList.add('active');
+        }
+
+        function toggleExtended() {
+            extendedEnabled = !extendedEnabled;
+            document.getElementById('extendedCheckbox').classList.toggle('active', extendedEnabled);
+        }
+
+        function formatNumber(num) {
+            return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        function showToast() {
+            const t = document.getElementById('toast');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 1500);
+        }
+
+        function createResult(percent, coeff, value, type, formula) {
+            const div = document.createElement('div');
+            div.className = `result-card ${type}`;
+            div.innerHTML = `
+                <div class="result-left">
+                    <span class="result-percent">${percent}</span>
+                    <span class="result-coeff">${coeff}</span>
+                </div>
+                <span class="result-value">${formatNumber(value)}</span>
+            `;
+            div.onclick = () => {
+                navigator.clipboard.writeText(Math.round(value).toString()).then(showToast);
+            };
+            div.title = formula;
+            return div;
+        }
+
+        function calculate() {
+            const a = parseFloat(document.getElementById('pointA').value) || 0;
+            const b = parseFloat(document.getElementById('pointB').value) || 0;
+            
+            if (a === b) {
+                alert('Точки должны отличаться');
+                return;
+            }
+
+            const diff = Math.abs(a - b);
+            document.getElementById('diffValue').textContent = formatNumber(diff);
+            
+            const baseLevels = [
+                {p: '38.2%', c: 0.382},
+                {p: '50.0%', c: 0.5},
+                {p: '61.8%', c: 0.618}
+            ];
+            
+            const extLevels = [
+                {p: '23.6%', c: 0.236},
+                {p: '78.6%', c: 0.786},
+                {p: '127.2%', c: 1.272},
+                {p: '261.8%', c: 2.618}
+            ];
+
+            document.getElementById('correctionResults').innerHTML = '';
+            document.getElementById('extensionResults').innerHTML = '';
+            document.getElementById('extendedCorrection').innerHTML = '';
+            document.getElementById('extendedExtension').innerHTML = '';
+
+            baseLevels.forEach(l => {
+                let corr, ext;
+                if (currentDirection === 'up') {
+                    corr = b - (diff * l.c);
+                    ext = b + (diff * l.c);
+                } else {
+                    corr = b + (diff * l.c);
+                    ext = b - (diff * l.c);
+                }
+                
+                document.getElementById('correctionResults').appendChild(
+                    createResult(l.p, l.c.toFixed(3), corr, 'correction', 
+                        `${formatNumber(b)} ${currentDirection === 'up' ? '-' : '+'} (${formatNumber(diff)} × ${l.c})`)
+                );
+                
+                document.getElementById('extensionResults').appendChild(
+                    createResult(l.p, l.c.toFixed(3), ext, 'extension',
+                        `${formatNumber(b)} ${currentDirection === 'up' ? '+' : '-'} (${formatNumber(diff)} × ${l.c})`)
+                );
+            });
+
+            if (extendedEnabled) {
+                document.getElementById('extendedResults').style.display = 'block';
+                
+                extLevels.forEach(l => {
+                    let corr, ext;
+                    if (currentDirection === 'up') {
+                        corr = b - (diff * l.c);
+                        ext = b + (diff * l.c);
+                    } else {
+                        corr = b + (diff * l.c);
+                        ext = b - (diff * l.c);
+                    }
+                    
+                    if (l.c < 1) {
+                        document.getElementById('extendedCorrection').appendChild(
+                            createResult(l.p, l.c.toFixed(3), corr, 'correction', '')
+                        );
+                    }
+                    
+                    document.getElementById('extendedExtension').appendChild(
+                        createResult(l.p, l.c.toFixed(3), ext, 'extension', '')
+                    );
+                });
+            } else {
+                document.getElementById('extendedResults').style.display = 'none';
+            }
+
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
